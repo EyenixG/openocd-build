@@ -23,8 +23,18 @@ function download_openocd()
       cd "${WORK_FOLDER_PATH}"
       git_clone "${OPENOCD_GIT_URL}" "${OPENOCD_GIT_BRANCH}" \
           "${OPENOCD_GIT_COMMIT}" "${OPENOCD_SRC_FOLDER_NAME}"
+    )
+  fi
+
+  # A pre-populated source folder (for example a local clone of an
+  # unpublished branch) may still lack its submodules.
+  if [ ! -f "${WORK_FOLDER_PATH}/${OPENOCD_SRC_FOLDER_NAME}/jimtcl/configure" ]
+  then
+    (
+      xbb_activate
+
       cd "${WORK_FOLDER_PATH}/${OPENOCD_SRC_FOLDER_NAME}"
-      git submodule update --init --recursive --remote
+      git submodule update --init ${OPENOCD_SUBMODULE_UPDATE_ARGS}
     )
   fi
 }
@@ -196,6 +206,7 @@ function do_openocd()
             --disable-zy1000-master \
             --disable-zy1000 \
             --disable-internal-libjaylink \
+            ${OPENOCD_CONFIGURE_EXTRA} \
 
           cp "config.log" "${LOGS_FOLDER_PATH}/config-openocd-log.txt"
         ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-openocd-output.txt"

@@ -175,6 +175,9 @@ README_OUT_FILE_NAME="README-${RELEASE_VERSION}.md"
 LIBFTDI_PATCH=""
 LIBUSB_W32_PATCH=""
 
+OPENOCD_SUBMODULE_UPDATE_ARGS="--recursive"$'\n'"--remote"
+OPENOCD_CONFIGURE_EXTRA=""
+
 # Keep them in sync with combo archive content.
 if [[ "${RELEASE_VERSION}" =~ 0\.10\.0-7 ]]
 then
@@ -336,6 +339,38 @@ then
   HIDAPI_VERSION="0.8.0-rc1"
 
   # LIBFTDI_PATCH="libftdi1-${LIBFTDI_VERSION}-cmake-FindUSB1.patch"
+  LIBUSB_W32_PATCH="libusb-win32-${LIBUSB_W32_VERSION}-mingw-w64.patch"
+
+  # ---------------------------------------------------------------------------
+elif [[ "${RELEASE_VERSION}" =~ 0\.12\.0-eyenix ]]
+then
+
+  # ---------------------------------------------------------------------------
+  # Mainline OpenOCD (openocd-org, 0.12.0+dev) with the Eyenix patches.
+  # riscv-collab/riscv-openocd was archived in 2026-07.
+
+  OPENOCD_VERSION="${RELEASE_VERSION}"
+
+  OPENOCD_GIT_URL=${OPENOCD_GIT_URL:-"https://github.com/EyenixG/riscv-openocd.git"}
+  OPENOCD_GIT_BRANCH=${OPENOCD_GIT_BRANCH:-"Eyenix-opt.2026-11"}
+  OPENOCD_GIT_COMMIT=${OPENOCD_GIT_COMMIT:-"8c1725984c483e25ce42c0f1bfab9e8f502a03b0"}
+
+  # Use the pinned jimtcl; libjaylink is not built.
+  OPENOCD_SUBMODULE_UPDATE_ARGS="jimtcl"
+  # Mainline expects an external jimtcl >= 0.79 by default.
+  # The ARM SBC bitbang drivers need sys/mman.h, which mingw lacks, and
+  # mainline configure fails instead of skipping them.
+  OPENOCD_CONFIGURE_EXTRA="--enable-internal-jimtcl"$'\n'"--disable-ep93xx"$'\n'"--disable-at91rm9200"$'\n'"--disable-bcm2835gpio"
+
+  # ---------------------------------------------------------------------------
+
+  LIBUSB1_VERSION="1.0.22"
+  LIBUSB0_VERSION="0.1.5"
+  LIBUSB_W32_VERSION="1.2.6.0"
+  LIBFTDI_VERSION="1.4"
+  LIBICONV_VERSION="1.15"
+  HIDAPI_VERSION="0.8.0-rc1"
+
   LIBUSB_W32_PATCH="libusb-win32-${LIBUSB_W32_VERSION}-mingw-w64.patch"
 
   # ---------------------------------------------------------------------------
